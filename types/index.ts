@@ -31,3 +31,32 @@ export interface ChatMessage {
   content: string;
   sources?: ChatSource[];
 }
+
+export interface Database {
+  public: {
+    Tables: {
+      notes: {
+        Row: NoteRecord;
+        Insert: {
+          id?: string;
+          content: string;
+          summary?: string | null;
+          tags?: string[] | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          content?: string;
+          summary?: string | null;
+          tags?: string[] | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+}
