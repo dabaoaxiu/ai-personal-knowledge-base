@@ -1,7 +1,9 @@
-import type { NoteCardData, NoteRecord } from "@/types";
+import type { Database, NoteCardData, NoteRecord } from "@/types";
 import { isSupabaseConfigured } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { dedupeTags, extractTitle, getQueryTerms, normalizeTag } from "@/lib/utils";
+
+type NoteInsert = Database["public"]["Tables"]["notes"]["Insert"];
 
 function toCard(note: NoteRecord): NoteCardData {
   return {
@@ -72,13 +74,15 @@ export async function getNoteById(id: string) {
 
 export async function createNote(input: { content: string; summary: string; tags: string[] }) {
   const client = getSupabaseAdmin();
+  const payload: NoteInsert = {
+    content: input.content,
+    summary: input.summary,
+    tags: dedupeTags(input.tags)
+  };
+
   const { data, error } = await client
     .from("notes")
-    .insert({
-      content: input.content,
-      summary: input.summary,
-      tags: dedupeTags(input.tags)
-    })
+    .insert(payload as never)
     .select("*")
     .single();
 
