@@ -72,7 +72,7 @@ export function DashboardComposer({ canSave, aiEnabled }: { canSave: boolean; ai
       />
 
       <div className="mt-4 flex flex-col gap-2 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between">
-        <p>{aiEnabled ? "AI summary and tags will be generated on save." : "OpenAI is not configured, so fallback summary and tags will be used."}</p>
+        <p>{aiEnabled ? "Gemini summary and tags will be generated on save." : "Gemini is not configured, so fallback summary and tags will be used."}</p>
         {!canSave && <p className="text-rose-600">Configure Supabase before saving notes.</p>}
       </div>
 

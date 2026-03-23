@@ -1,6 +1,6 @@
 # AI Personal Knowledge Base
 
-A complete web app built with Next.js App Router, TypeScript, Tailwind CSS, Supabase, and the OpenAI API.
+A complete web app built with Next.js App Router, TypeScript, Tailwind CSS, Supabase, and the Gemini API.
 
 ## Tech Stack
 
@@ -8,7 +8,7 @@ A complete web app built with Next.js App Router, TypeScript, Tailwind CSS, Supa
 - TypeScript
 - Tailwind CSS
 - Supabase
-- OpenAI API
+- Gemini API
 - Vercel-ready project structure
 
 ## Project Structure
@@ -42,7 +42,7 @@ A complete web app built with Next.js App Router, TypeScript, Tailwind CSS, Supa
 |-- lib
 |   |-- env.ts
 |   |-- notes.ts
-|   |-- openai.ts
+|   |-- gemini.ts
 |   |-- supabase.ts
 |   `-- utils.ts
 |-- supabase
@@ -92,8 +92,8 @@ Copy `.env.example` to `.env.local` and fill in:
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4.1-mini
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 ## Supabase Setup
@@ -123,5 +123,5 @@ Deploy directly to Vercel:
 
 ## Notes
 
-- If OpenAI is not configured, note saving still works with fallback summary and tags.
-- Chat requires both Supabase and OpenAI.
+- If Gemini is not configured, note saving still works with fallback summary and tags.
+- Chat requires both Supabase and Gemini.

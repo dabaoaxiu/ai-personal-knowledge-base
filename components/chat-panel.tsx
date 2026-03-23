@@ -42,7 +42,7 @@ export function ChatPanel({ canChat }: { canChat: boolean }) {
       const payload = (await response.json()) as { answer?: string; sources?: ChatSource[]; error?: string };
 
       if (!response.ok) {
-        throw new Error(payload.error || "AI response failed. Please try again.");
+        throw new Error(payload.error || "Gemini response failed. Please try again.");
       }
 
       setMessages((current) => [
@@ -54,7 +54,7 @@ export function ChatPanel({ canChat }: { canChat: boolean }) {
         }
       ]);
     } catch (submissionError) {
-      setError(submissionError instanceof Error ? submissionError.message : "AI response failed. Please try again.");
+      setError(submissionError instanceof Error ? submissionError.message : "Gemini response failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -67,7 +67,7 @@ export function ChatPanel({ canChat }: { canChat: boolean }) {
           <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Grounded Chat</p>
           <h2 className="mt-2 font-serif text-3xl">Ask against your knowledge base</h2>
         </div>
-        {!canChat && <p className="text-sm text-rose-600">Configure both Supabase and OpenAI to enable chat.</p>}
+        {!canChat && <p className="text-sm text-rose-600">Configure both Supabase and Gemini to enable chat.</p>}
       </div>
 
       <div className="mt-6 space-y-4 rounded-[28px] bg-stone-50 p-4">
@@ -98,7 +98,7 @@ export function ChatPanel({ canChat }: { canChat: boolean }) {
           </div>
         ))}
 
-        {isSubmitting && <p className="text-sm text-stone-500">AI is preparing an answer...</p>}
+        {isSubmitting && <p className="text-sm text-stone-500">Gemini is preparing an answer...</p>}
       </div>
 
       <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3 md:flex-row">

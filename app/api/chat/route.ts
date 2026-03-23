@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { isOpenAIConfigured, isSupabaseConfigured } from "@/lib/env";
+import { isGeminiConfigured, isSupabaseConfigured } from "@/lib/env";
+import { answerWithKnowledge } from "@/lib/gemini";
 import { getRelevantNotes } from "@/lib/notes";
-import { answerWithKnowledge } from "@/lib/openai";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +16,10 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!isOpenAIConfigured()) {
+  if (!isGeminiConfigured()) {
     return NextResponse.json(
       {
-        error: "OpenAI is not configured."
+        error: "Gemini is not configured."
       },
       { status: 500 }
     );

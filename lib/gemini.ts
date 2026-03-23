@@ -1,23 +1,23 @@
-import OpenAI from "openai";
+import { GoogleGenAI, Type } from "@google/genai";
 
-import { env, isOpenAIConfigured } from "@/lib/env";
+import { env, isGeminiConfigured } from "@/lib/env";
 import type { ChatAnswer, NoteAnalysis, NoteRecord } from "@/types";
 import { createFallbackSummary, dedupeTags, deriveFallbackTags, extractTitle, truncate } from "@/lib/utils";
 
-let openaiClient: OpenAI | null = null;
+let geminiClient: GoogleGenAI | null = null;
 
-function getOpenAIClient() {
-  if (!isOpenAIConfigured()) {
-    throw new Error("OPENAI_API_KEY is missing.");
+function getGeminiClient() {
+  if (!isGeminiConfigured()) {
+    throw new Error("GEMINI_API_KEY is missing.");
   }
 
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: env.openAIApiKey
+  if (!geminiClient) {
+    geminiClient = new GoogleGenAI({
+      apiKey: env.geminiApiKey
     });
   }
 
-  return openaiClient;
+  return geminiClient;
 }
 
 function extractJsonObject(raw: string) {
@@ -43,29 +43,39 @@ export async function analyzeNote(content: string): Promise<NoteAnalysis> {
     tags: deriveFallbackTags(content)
   };
 
-  if (!isOpenAIConfigured()) {
+  if (!isGeminiConfigured()) {
     return fallback;
   }
 
   try {
-    const client = getOpenAIClient();
-    const response = await client.responses.create({
-      model: env.openAIModel,
-      temperature: 0.2,
-      input: [
-        {
-          role: "system",
-          content:
-            "You turn raw knowledge snippets into a concise summary and a short tag list. Respond with strict JSON using this shape only: {\"summary\": string, \"tags\": string[]}. The summary should be under 80 words. Use 2 to 5 tags."
-        },
-        {
-          role: "user",
-          content
+    const client = getGeminiClient();
+    const response = await client.models.generateContent({
+      model: env.geminiModel,
+      contents: content,
+      config: {
+        temperature: 0.2,
+        systemInstruction:
+          "You turn raw knowledge snippets into a concise summary and a short tag list. Return strict JSON only with this shape: {\"summary\": string, \"tags\": string[]}. The summary should be under 80 words. Use 2 to 5 tags.",
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            summary: {
+              type: Type.STRING
+            },
+            tags: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.STRING
+              }
+            }
+          },
+          required: ["summary", "tags"]
         }
-      ]
+      }
     });
 
-    const raw = extractJsonObject(response.output_text || "");
+    const raw = extractJsonObject(response.text || "");
     const parsed = JSON.parse(raw) as Partial<NoteAnalysis>;
 
     return {
@@ -85,8 +95,8 @@ export async function answerWithKnowledge(question: string, notes: NoteRecord[])
     };
   }
 
-  if (!isOpenAIConfigured()) {
-    throw new Error("OPENAI_API_KEY is missing.");
+  if (!isGeminiConfigured()) {
+    throw new Error("GEMINI_API_KEY is missing.");
   }
 
   const context = notes
@@ -108,25 +118,19 @@ export async function answerWithKnowledge(question: string, notes: NoteRecord[])
     })
     .join("\n\n---\n\n");
 
-  const client = getOpenAIClient();
-  const response = await client.responses.create({
-    model: env.openAIModel,
-    temperature: 0.3,
-    input: [
-      {
-        role: "system",
-        content:
-          "You are an AI knowledge base assistant. Answer only from the provided knowledge sources. If the answer is not supported by the sources, say that the knowledge base does not contain enough information yet. Keep the answer clear and practical."
-      },
-      {
-        role: "user",
-        content: `Question:\n${question}\n\nKnowledge sources:\n${context}`
-      }
-    ]
+  const client = getGeminiClient();
+  const response = await client.models.generateContent({
+    model: env.geminiModel,
+    contents: `Question:\n${question}\n\nKnowledge sources:\n${context}`,
+    config: {
+      temperature: 0.3,
+      systemInstruction:
+        "You are an AI knowledge base assistant. Answer only from the provided knowledge sources. If the answer is not supported by the sources, say that the knowledge base does not contain enough information yet. Keep the answer clear and practical."
+    }
   });
 
   return {
-    answer: response.output_text?.trim() || "I could not prepare an answer just now. Please try another phrasing.",
+    answer: response.text?.trim() || "I could not prepare an answer just now. Please try another phrasing.",
     sources: notes.map((note) => ({
       id: note.id,
       title: extractTitle(note.content)

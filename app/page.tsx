@@ -1,7 +1,7 @@
 import { DashboardComposer } from "@/components/dashboard-composer";
 import { EmptyState } from "@/components/empty-state";
 import { NoteCard } from "@/components/note-card";
-import { isOpenAIConfigured, isSupabaseConfigured } from "@/lib/env";
+import { isGeminiConfigured, isSupabaseConfigured } from "@/lib/env";
 import { listNotes } from "@/lib/notes";
 
 export const dynamic = "force-dynamic";
@@ -9,12 +9,12 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const recentNotes = await listNotes({ limit: 6 });
   const supabaseReady = isSupabaseConfigured();
-  const openaiReady = isOpenAIConfigured();
+  const geminiReady = isGeminiConfigured();
 
   return (
     <div className="space-y-8">
       <section className="grid gap-8 lg:grid-cols-[1.3fr,0.7fr]">
-        <DashboardComposer canSave={supabaseReady} aiEnabled={openaiReady} />
+        <DashboardComposer canSave={supabaseReady} aiEnabled={geminiReady} />
 
         <div className="rounded-[32px] border border-stone-200 bg-white/90 p-6 shadow-soft">
           <p className="text-xs uppercase tracking-[0.3em] text-stone-400">Overview</p>
@@ -28,10 +28,10 @@ export default async function HomePage() {
             </div>
 
             <div className="rounded-[24px] bg-stone-50 p-5">
-              <p className="text-xs uppercase tracking-[0.25em] text-stone-400">AI Status</p>
-              <p className="mt-3 text-lg font-semibold">{openaiReady ? "Connected" : "Needs setup"}</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-stone-400">Gemini Status</p>
+              <p className="mt-3 text-lg font-semibold">{geminiReady ? "Connected" : "Needs setup"}</p>
               <p className="mt-2 text-sm text-stone-500">
-                {openaiReady ? "New notes get AI summaries and tags automatically." : "Saving still works, but AI summaries and chat require OpenAI."}
+                {geminiReady ? "New notes get Gemini summaries and tags automatically." : "Saving still works, but AI summaries and chat require Gemini."}
               </p>
             </div>
           </div>

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { isSupabaseConfigured } from "@/lib/env";
+import { analyzeNote } from "@/lib/gemini";
 import { createNote, listNotes } from "@/lib/notes";
-import { analyzeNote } from "@/lib/openai";
 
 export const dynamic = "force-dynamic";
 
